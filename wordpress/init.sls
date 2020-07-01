@@ -19,7 +19,11 @@ download_wordpress_{{ id }}:
   - cwd: {{ map.docroot }}/{{ id }}
   - name: '/usr/local/bin/wp core download --path="{{ map.docroot }}/{{ id }}/"'
   - env: {{ wp_cli_env|json }}
+{%- if salt['grains.get']('saltversioninfo') < [2018, 3, 0] %}
   - user: {{ map.www_user }}
+{%- else %}
+  - runas: {{ map.www_user }}
+{%- endif %}
   - unless: test -f {{ map.docroot }}/{{ id }}/wp-config.php
 
 # This command tells wp-cli to create our wp-config.php, DB info needs to be the same as above
@@ -28,7 +32,11 @@ configure_{{ id }}:
   - name: '/usr/local/bin/wp core config --dbname="{{ site.get('database') }}" --dbuser="{{ site.get('dbuser') }}" --dbpass="{{ site.get('dbpass') }}" --dbhost="{{ site.get('dbhost') }}" --path="{{ map.docroot }}/{{ id }}"'
   - cwd: {{ map.docroot }}/{{ id }}
   - env: {{ wp_cli_env|json }}
+{%- if salt['grains.get']('saltversioninfo') < [2018, 3, 0] %}
   - user: {{ map.www_user }}
+{%- else %}
+  - runas: {{ map.www_user }}
+{%- endif %}
   - unless: test -f {{ map.docroot }}/{{ id }}/wp-config.php  
 
 # This command tells wp-cli to install wordpress
@@ -37,6 +45,10 @@ install_{{ id }}:
   - cwd: {{ map.docroot }}/{{ id }}
   - name: '/usr/local/bin/wp core install --url="{{ site.get('url') }}" --title="{{ site.get('title') }}" --admin_user="{{ site.get('username') }}" --admin_password="{{ site.get('password') }}" --admin_email="{{ site.get('email') }}" --path="{{ map.docroot }}/{{ id }}/"'
   - env: {{ wp_cli_env|json }}
+{%- if salt['grains.get']('saltversioninfo') < [2018, 3, 0] %}
   - user: {{ map.www_user }}
+{%- else %}
+  - runas: {{ map.www_user }}
+{%- endif %}
   - unless: /usr/local/bin/wp core is-installed --path="{{ map.docroot }}/{{ id }}"
 {% endfor %}
