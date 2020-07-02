@@ -12,7 +12,7 @@ configure_plugin_{{ plugin_name }}:
 {%- else %}
   - runas: {{ map.www_user }}
 {%- endif %}
-  - unless: '/usr/local/bin/wp plugin is-installed {{ plugin_name }}'
+  - unless: '/usr/local/bin/wp --path={{ map.docroot }}/{{ name }} plugin is-installed {{ plugin_name }}'
   
 
     {% endfor %}
